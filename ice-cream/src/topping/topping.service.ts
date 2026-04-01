@@ -1,39 +1,41 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateToppingDto } from './dto/create-topping.dto';
 import { UpdateToppingDto } from './dto/update-topping.dto';
-export interface Toppings {
-  id: string;
-  name: string;
-  price: number;
-}
+import { ToppingsRepository } from './topping.repository';
 
 @Injectable()
-export class ToppingService {
-  private toppings: Toppings[] = [];
+export class ToppingsService {
+  constructor(private readonly toppingsRepository: ToppingsRepository) {}
 
-  obtenerToppings() {
-    return this.toppings;
+  async create(createToppingDto: CreateToppingDto) {
+    return this.toppingsRepository.create(createToppingDto);
   }
 
-  untopping(id: string) {
-    return this.toppings.find((topping) => topping.id === id);
+  async findAll() {
+    return this.toppingsRepository.findAll();
   }
 
-  crearTopping(topping: any) {
-    const nuevoTopping: Toppings = {
-      id: (this.toppings.length + 1).toString(),
-      name: topping.name,
-      price: topping.price,
-    };
-    this.toppings.push(nuevoTopping);
-    return nuevoTopping;
+  async findAvailable() {
+    return this.toppingsRepository.findAvailable();
   }
 
-  actualizarTopping(id: string, topping: any) {
-    return 'actualizar un topping';
+  async findOne(id: number) {
+    const topping = await this.toppingsRepository.findById(id);
+
+    if (!topping) {
+      throw new NotFoundException(`No se encontró el topping con id ${id}`);
+    }
+
+    return topping;
   }
 
-  eliminarTopping() {
-    return 'eliminar un topping';
+  async update(id: number, updateToppingDto: UpdateToppingDto) {
+    await this.findOne(id);
+    return this.toppingsRepository.update(id, updateToppingDto);
+  }
+
+  async remove(id: number) {
+    await this.findOne(id);
+    return this.toppingsRepository.remove(id);
   }
 }

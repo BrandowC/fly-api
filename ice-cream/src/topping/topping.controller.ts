@@ -1,43 +1,51 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
 } from '@nestjs/common';
-import { ToppingService } from './topping.service';
+import { ToppingsService } from './topping.service';
 import { CreateToppingDto } from './dto/create-topping.dto';
 import { UpdateToppingDto } from './dto/update-topping.dto';
-import { Topping } from './entities/topping.entity';
 
-@Controller({})
-export class ToppingController {
-  constructor(private readonly toppingService: ToppingService) {}
+@Controller('toppings')
+export class ToppingsController {
+  constructor(private readonly toppingsService: ToppingsService) {}
 
-  @Get('/toppings')
-  obtenertoppings() {
-    return this.toppingService.obtenerToppings();
+  @Post()
+  create(@Body() createToppingDto: CreateToppingDto) {
+    return this.toppingsService.create(createToppingDto);
   }
 
-  @Get('/toppings/:id')
-  untopping(@Param('id') id: string) {
-    return this.toppingService.untopping(id);
+  @Get()
+  findAll() {
+    return this.toppingsService.findAll();
   }
 
-  @Post('/toppings')
-  creartoppind(@Body() topping: any) {
-    return this.toppingService.crearTopping(topping);
+  @Get('disponibles')
+  findAvailable() {
+    return this.toppingsService.findAvailable();
+  }
+
+  @Get(':id')
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.toppingsService.findOne(id);
   }
 
   @Patch(':id')
-  actualizartopping(@Param('id') id: string, @Body() topping: any) {
-    return this.toppingService.actualizarTopping(id, topping);
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateToppingDto: UpdateToppingDto,
+  ) {
+    return this.toppingsService.update(id, updateToppingDto);
   }
 
   @Delete(':id')
-  eliminartopping() {
-    return this.toppingService.eliminarTopping();
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.toppingsService.remove(id);
   }
 }
