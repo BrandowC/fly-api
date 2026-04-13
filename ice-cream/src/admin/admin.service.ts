@@ -1,26 +1,28 @@
 import { Injectable } from '@nestjs/common';
-import { CreateAdminDto } from './dto/create-admin.dto';
-import { UpdateAdminDto } from './dto/update-admin.dto';
+import { AdminRepository } from './admin.repository';
+import { ProductosService } from '../productos/productos.service';
+import { ToppingsService } from '../topping/topping.service';
 
 @Injectable()
 export class AdminService {
-  create(createAdminDto: CreateAdminDto) {
-    return 'This action adds a new admin';
+  constructor(
+    private readonly adminRepo: AdminRepository,
+    private readonly productosService: ProductosService,
+    private readonly toppingsService: ToppingsService,
+  ) {}
+
+  async getDashboard() {
+    return this.adminRepo.getDashboardStats();
   }
 
-  findAll() {
-    return `This action returns all admin`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} admin`;
-  }
-
-  update(id: number, updateAdminDto: UpdateAdminDto) {
-    return `This action updates a #${id} admin`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} admin`;
+  async getPedidosRecientes(inicio?: string, fin?: string) {
+    if (inicio && fin) {
+      return this.adminRepo.getPedidosPorFecha(new Date(inicio), new Date(fin));
+    }
+    // Si no hay fechas, devolvemos todo lo que el repo de admin decida
+    return this.adminRepo.getPedidosPorFecha(
+      new Date('2024-01-01'),
+      new Date(),
+    );
   }
 }

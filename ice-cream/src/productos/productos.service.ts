@@ -1,26 +1,38 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { ProductosRepository } from './productos.repository';
 import { CreateProductoDto } from './dto/create-producto.dto';
 import { UpdateProductoDto } from './dto/update-producto.dto';
 
 @Injectable()
 export class ProductosService {
-  create(createProductoDto: CreateProductoDto) {
-    return 'This action adds a new producto';
+  constructor(private readonly repository: ProductosRepository) {}
+
+  create(dto: CreateProductoDto) {
+    return this.repository.create(dto);
   }
 
   findAll() {
-    return `This action returns all productos`;
+    return this.repository.findAll();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} producto`;
+  async findOne(id: number) {
+    const producto = await this.repository.findById(id);
+    if (!producto) throw new NotFoundException(`Producto ${id} no encontrado`);
+    return producto;
   }
 
-  update(id: number, updateProductoDto: UpdateProductoDto) {
-    return `This action updates a #${id} producto`;
+  // Útil para la pantalla de "Armar Helado" en Expo Go
+  findByType(tipo: string) {
+    return this.repository.findByType(tipo);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} producto`;
+  async update(id: number, dto: UpdateProductoDto) {
+    await this.findOne(id);
+    return this.repository.update(id, dto);
+  }
+
+  async remove(id: number) {
+    await this.findOne(id);
+    return this.repository.remove(id);
   }
 }
