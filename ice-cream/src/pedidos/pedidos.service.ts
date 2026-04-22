@@ -59,6 +59,10 @@ export class PedidosService {
     return await this.repository.findAll();
   }
 
+  async toggleCompletado(id: number) {
+    return await this.repository.toggleCompletado(id);
+  }
+
   private generarLinkWhatsApp(pedido: any): string {
     const numeroTienda = '573XXXXXXXXX'; // Cambia esto por tu número real
     let texto = `*¡Nuevo Pedido de Helado!*%0A%0A`;

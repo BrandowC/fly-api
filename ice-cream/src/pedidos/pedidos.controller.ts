@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
   Body,
   Param,
   ParseIntPipe,
@@ -25,10 +26,15 @@ export class PedidosController {
     return await this.pedidosService.findAll();
   }
 
+  // Marcar un pedido como completado/pendiente (toggle)
+  @Patch(':id/toggle')
+  async toggleCompletado(@Param('id', ParseIntPipe) id: number) {
+    return await this.pedidosService.toggleCompletado(id);
+  }
+
   // Ruta extra por si el Admin quiere ver un pedido específico por ID
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
-    // Nota: Deberás implementar findOne en tu service si decides usar esto
     return { message: `Buscando pedido con ID ${id}` };
   }
 }
