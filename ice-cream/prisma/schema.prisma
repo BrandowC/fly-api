@@ -1,0 +1,66 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Admin {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  createdAt DateTime @default(now())
+}
+
+model Topping {
+  id          Int      @id @default(autoincrement())
+  nombre      String
+  descripcion String?
+  precio      Decimal  @db.Decimal(10,2)
+  imagenUrl   String?
+  disponible  Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  pedidoDetalles PedidoDetalle[]
+}
+
+model Producto {
+  id          Int      @id @default(autoincrement())
+  nombre      String   // Ejemplo: "Vaso Pequeño", "Helado de Fresa"
+  tipo        String   // "VASO" o "HELADO"
+  precio      Decimal  @db.Decimal(10,2)
+  disponible  Boolean  @default(true)
+  pedidos     PedidoDetalle[]
+}
+
+model Pedido {
+  id           Int             @id @default(autoincrement())
+  clienteNombre String
+  telefono     String
+  direccion    String
+  total        Decimal         @db.Decimal(10,2)
+  completado   Boolean         @default(false)
+  createdAt    DateTime        @default(now())
+  detalles     PedidoDetalle[]
+}
+
+model PedidoDetalle {
+  id         Int      @id @default(autoincrement())
+  pedidoId   Int
+  productoId Int
+  toppingId  Int?     // Opcional por si no quiere topping
+  cantidad   Int      @default(1)
+  subtotal   Decimal  @db.Decimal(10,2)
+
+  pedido     Pedido   @relation(fields: [pedidoId], references: [id])
+  producto   Producto @relation(fields: [productoId], references: [id])
+  topping    Topping? @relation(fields: [toppingId], references: [id])
+}
